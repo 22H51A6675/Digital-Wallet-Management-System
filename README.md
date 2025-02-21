@@ -11,7 +11,6 @@ A digital wallet management system implemented in C++ that allows users to manag
 - [How to Install and Run the Project](#how-to-install-and-run-the-project)
 - [How to Use the Project](#how-to-use-the-project)
 - [Include Tests](#include-tests)
-- [Screenshots/Media](#screenshotsmedia)
 - [Future](#future)
 - [How to Contribute to the Project](#how-to-contribute-to-the-project)
 - [License](#license)
