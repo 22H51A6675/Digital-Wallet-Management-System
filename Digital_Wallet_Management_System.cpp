@@ -1,103 +1,81 @@
-#include <iostream>
+#include <cmath>
+#include <cstdio>
 #include <vector>
+#include <iostream>
 #include <algorithm>
-#include <iomanip>
-
 using namespace std;
 
-vector<int> user_ids;
-vector<double> balances;
+void quicksort(int balance[], int user_id[], int low, int high) {
+    if (low<high) {
+        int pivot=balance[high];
+        int i=(low-1);
+        for (int j=low;j<=high-1;j++) {
+            if (balance[j]<=pivot) {
+                i++;
+                swap(balance[i],balance[j]);
+                swap(user_id[i],user_id[j]);
+            }
+        }
 
-void add_user(int id, double balance) {
-    if (id < 0 || balance < 0) {
-        cerr << "Error: User ID and balance must be non-negative." << endl;
-        return;
-    }
-    user_ids.push_back(id);
-    balances.push_back(balance);
-}
+        swap(balance[i+1],balance[high]);
+        swap(user_id[i+1],user_id[high]);
 
-bool transfer_funds(int from_id, int to_id, double amount) {
-    if (amount < 0) {
-        cerr << "Error: Transfer amount must be non-negative." << endl;
-        return false;
-    }
-
-    auto from_it = find(user_ids.begin(), user_ids.end(), from_id);
-    auto to_it = find(user_ids.begin(), user_ids.end(), to_id);
-
-    if (from_it == user_ids.end() || to_it == user_ids.end()) {
-        cerr << "Error: User ID not found." << endl;
-        return false;
-    }
-
-    int from_index = distance(user_ids.begin(), from_it);
-    int to_index = distance(user_ids.begin(), to_it);
-
-    if (balances[from_index] < amount) {
-        cerr << "Error: Insufficient funds." << endl;
-        return false;
-    }
-
-    balances[from_index] -= amount;
-    balances[to_index] += amount;
-    return true;
-}
-
-void sort_and_display_users() {
-    vector<pair<int, double>> users;
-    for (size_t i = 0; i < user_ids.size(); ++i) {
-        users.emplace_back(user_ids[i], balances[i]);
-    }
-
-    sort(users.begin(), users.end(), [](const auto& a, const auto& b) {
-        return a.second < b.second;
-    });
-
-    for (const auto& user : users) {
-        cout << user.first << " " << fixed << setprecision(0) << user.second << endl;
+        quicksort(balance,user_id,low,i);
+        quicksort(balance, user_id,i+2,high);
     }
 }
+
 
 int main() {
     int n;
-    cout << "Enter the number of users: ";
-    cin >> n;
+    cin>>n;
 
-    if (n < 0) {
-        cerr << "Error: Number of users must be non-negative." << endl;
-        return 1;
-    }
-
-    for (int i = 0; i < n; ++i) {
-        int id;
-        double balance;
-        cout << "Enter user ID and balance: ";
-        cin >> id >> balance;
-        add_user(id, balance);
-    }
+    int user_id[n],balance[n];
+    for(int i=0;i<n;i++)
+        cin>>user_id[i]>>balance[i];
 
     int t;
-    cout << "Enter the number of transactions: ";
-    cin >> t;
+    cin>>t;
+    string result[t];
+    int result_index=0;
+    while(t--){
+        int sender_index=-1,reciever_index=-1;
+        int from_userID,to_userID,amount;
+        cin>>from_userID>>to_userID>>amount;
+        for(int i=0;i<n;i++){
+            if(user_id[i]==from_userID)
+            {
+                sender_index=i;
+            }
+            else if(user_id[i] == to_userID)
+            {
+                reciever_index=i;
+            }
+        }
+            if(sender_index!=-1 && reciever_index!=-1 && balance[sender_index]>=amount)
+            {
+                balance[sender_index]-=amount;
+                balance[reciever_index]+=amount;
+               // cout<<"Success"<<"\n";
+                result[result_index++]="Success";
+            }
+            else
+            {
+                //cout<<"Failure"<<"\n";
+                result[result_index++]="Failure";
+            }
+        }
 
-    if (t < 0) {
-        cerr << "Error: Number of transactions must be non-negative." << endl;
-        return 1;
+
+        quicksort(balance,user_id,0,n-1);
+        for(int i=0;i<result_index;i++){
+        cout<<result[i]<<endl;
+        }
+        cout<<endl;
+        for (int i=0; i<n;i++) {
+        cout<<user_id[i]<<" "<< balance[i]<<endl;
     }
 
-    for (int i = 0; i < t; ++i) {
-        int from_id, to_id;
-        double amount;
-        cout << "Enter from ID, to ID, and amount: ";
-        cin >> from_id >> to_id >> amount;
-
-        bool success = transfer_funds(from_id, to_id, amount);
-        cout << (success ? "Success" : "Failure") << endl;
-    }
-
-    cout << endl;
-    sort_and_display_users();
-
+    /* Enter your code here. Read input from STDIN. Print output to STDOUT */
     return 0;
 }
